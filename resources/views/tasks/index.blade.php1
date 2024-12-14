@@ -1,0 +1,82 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="container">
+    <h1>Tasks</h1>
+
+    <div class="mb-3">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createTaskModal">Create Task</button>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Due Date</th>
+                <th>Assigned Users</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($tasks as $task)
+
+            @php
+                // $task_users = DB::table('task_user')->select('user_id')->where('task_id', $task_id)->pluck('user_id')->toArray();
+            @endphp
+
+            <tr>
+                <td>{{ $task->title }}</td>
+                <td>{{ $task->description }}</td>
+                <td>{{ ucfirst($task->status) }}</td>
+                <td>{{ $task->due_date }}</td>
+                <td>
+                    @foreach($task->users as $user)
+                    <span class="badge bg-info text-dark">{{ $user->name }}</span>
+                    @endforeach
+                </td>
+                <td>
+                    <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#editTaskModal" onclick="editTask({{ $task }})">Edit</button>
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#assignUserModal" onclick="assignUsers({{ $task->id }})">Assign Users</button>
+                    <form action="{{ route('tasks.destroy', $task->id) }}" method="POST" style="display: inline-block;">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                    </form>
+                </td>
+            </tr>
+
+            <!-- Assign Users Modal -->
+            @include('tasks.modals.assign_user')
+
+            @endforeach
+        </tbody>
+    </table>
+
+    <!-- Create Task Modal -->
+    @include('tasks.modals.create')
+
+    <!-- Edit Task Modal -->
+    @include('tasks.modals.edit')
+
+
+</div>
+
+<script>
+    function editTask(task) {
+    const form = document.getElementById('editTaskForm');
+    form.action = `/tasks/${task.id}`;
+
+    document.getElementById('editTitle').value = task.title;
+    document.getElementById('editDescription').value = task.description;
+    document.getElementById('editStatus').value = task.status;
+    document.getElementById('editDueDate').value = task.due_date;
+}
+
+function assignUsers(taskId) {
+    const form = document.getElementById('assignUserForm');
+    form.action = `/tasks/${taskId}/assign`;
+}
+</script>
+@endsection
