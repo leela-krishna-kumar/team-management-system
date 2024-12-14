@@ -1,66 +1,175 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Task Management System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Overview
+This Task Management System is a role-based access control (RBAC) application built using Laravel. It allows admins, managers, and members to manage teams, tasks, and assignments with features such as inline editing, dynamic AJAX functionality, and user-friendly modals for interaction.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### Role-Based Access Control (RBAC)
+- **Admin**: Full control over teams, tasks, and user roles.
+- **Manager**: Manage tasks and assign users within their teams.
+- **Member**: View and update tasks assigned to them.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Team Management
+- List, create, edit, and delete teams dynamically using AJAX.
+- View tasks associated with a selected team.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Task Management
+- CRUD operations for tasks with dynamic AJAX handling.
+- Assign/unassign multiple users to tasks using a pivot table.
+- Inline editing for task attributes like title, status, and due date.
+- View assigned users in real time.
 
-## Learning Laravel
+### User Management
+- Assign roles to users dynamically.
+- Edit and update user roles via modals.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Installation
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### Prerequisites
+- PHP 8.1+
+- Composer
+- Laravel 11
+- MySQL or PostgreSQL
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Steps
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd task-management-system
+   ```
 
-## Laravel Sponsors
+2. Install dependencies:
+   ```bash
+   composer install
+   npm install && npm run dev
+   ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+3. Configure `.env`:
+   ```env
+   APP_NAME=TaskManagementSystem
+   APP_ENV=local
+   APP_KEY=base64:randomGeneratedKey
+   APP_DEBUG=true
+   APP_URL=http://localhost
 
-### Premium Partners
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=task_management
+   DB_USERNAME=root
+   DB_PASSWORD=yourpassword
+   ```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+4. Run migrations and seeders:
+   ```bash
+   php artisan migrate --seed
+   ```
+
+5. Start the development server:
+   ```bash
+   php artisan serve
+   npm run dev
+   ```
+
+6. Access the application at [http://localhost:8000].
+
+## Database Schema
+
+### Tables
+- **Teams**: `id`, `name`, `description`, `created_at`, `updated_at`
+- **Tasks**: `id`, `team_id`, `title`, `description`, `status`, `due_date`, `created_at`, `updated_at`
+- **Users**: Laravel's default `users` table
+- **Roles**: `id`, `name`, `guard_name`, `created_at`, `updated_at`
+- **Permissions**: `id`, `name`, `guard_name`, `created_at`, `updated_at`
+- **Model Has Roles**: Pivot table for users and roles
+- **Model Has Permissions**: Pivot table for roles and permissions
+- **Task_User**: `id`, `task_id`, `user_id`, `assigned_at`
+
+### Relationships
+- `Team` has many `Tasks`.
+- `Task` belongs to a `Team`.
+- `Task` has many `Users` through the `Task_User` pivot table.
+
+## Key Endpoints
+
+### Team Management
+- `GET /teams`: Fetch all teams.
+- `POST /teams`: Create a new team.
+- `PUT /teams/{id}`: Update a team.
+- `DELETE /teams/{id}`: Delete a team.
+
+### Task Management
+- `GET /tasks/{team}`: Fetch tasks for a specific team.
+- `POST /tasks`: Create a new task.
+- `PUT /tasks/{id}`: Update a task.
+- `DELETE /tasks/{id}`: Delete a task.
+- `POST /tasks/{id}/assign-users`: Assign users to a task.
+
+### Role & Permission Management
+- `GET /roles-permissions`: List users with roles.
+- `POST /roles-permissions/assign-role`: Assign a role to a user.
+- `POST /roles-permissions/assign-permissions`: Assign permissions to a role.
+
+## Key Technologies
+- **Laravel**: Backend framework.
+- **Spatie Permissions**: Role and permission management.
+- **AJAX**: Dynamic interaction for frontend.
+- **Bootstrap**: Modal and responsive UI components.
+- **MySQL**: Relational database.
+
+## Usage Guide
+
+### Setting Up Roles and Permissions
+Roles and permissions are seeded during installation. If needed, you can modify or add new roles and permissions in the `RoleSeeder` or `PermissionSeeder` files.
+
+To assign roles programmatically:
+```php
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+
+$role = Role::create(['name' => 'Admin']);
+$permission = Permission::create(['name' => 'manage tasks']);
+$role->givePermissionTo($permission);
+```
+
+### Managing Users
+To assign roles to users:
+1. Navigate to the **Roles & Permissions** page.
+2. View the list of users and their roles.
+3. Click "Edit Roles" for a user to assign or update roles.
+
+To assign permissions to roles:
+1. Go to the **Roles & Permissions** page.
+2. Select a role and edit its permissions using the modal.
+3. Save the changes.
+
+### Task Assignment
+1. Navigate to a team’s task list.
+2. Click "Assign Users" for a task.
+3. Select users from the dropdown and save.
+
+### Inline Task Editing
+1. Double-click on a task field (e.g., title, status, due date).
+2. Edit the value and press Enter.
+3. Changes are saved dynamically.
+
+## Known Issues
+- Inline editing requires stable internet for real-time updates.
+- Roles and permissions must be manually configured for additional features.
+- Ensure correct role assignment during user creation to avoid permission conflicts.
 
 ## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+1. Fork the repository.
+2. Create a feature branch (`git checkout -b feature-name`).
+3. Commit changes (`git commit -m "Added feature"`).
+4. Push to the branch (`git push origin feature-name`).
+5. Open a pull request.
 
 ## License
+This project is open-source and available under the [MIT License](LICENSE).
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+
+Happy coding! If you encounter any issues, please open a GitHub issue or contact the maintainer.
+
