@@ -5,3 +5,6 @@ git commit -m "first commit"
 git branch -M main
 git remote add origin https://github.com/leela-krishna-kumar/team-management-system.git
 git push -u origin main
+git pull -u origin main
+
+git pull origin main
